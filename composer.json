@@ -1,0 +1,14 @@
+{
+  "autoload": {
+    "files": [
+      "src/helper.php"
+    ],
+    "psr-4": {
+      "Micro\\" : "src/"
+    }
+  },
+  "require": {
+    "ext-pdo": "*",
+    "ext-memcached": "*"
+  }
+}
