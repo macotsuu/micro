@@ -1,13 +1,23 @@
 {
   "autoload": {
     "files": [
-      "src/helper.php"
-    ],
-    "psr-4": {
-      "Micro\\" : "src/"
-    }
+      "app/helpers/cache.php",
+      "app/helpers/config.php",
+      "app/helpers/database.php",
+      "app/helpers/logger.php",
+      "app/helpers/template.php"
+    ]
   },
+
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/macotsuu/micro-framework"
+    }
+  ],
+
   "require": {
+    "micro/core": "dev-master",
     "ext-pdo": "*",
     "ext-memcached": "*"
   }

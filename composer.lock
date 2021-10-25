@@ -4,12 +4,46 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "81ad5e338e68dfbb3af6c5f0105794b5",
-    "packages": [],
+    "content-hash": "ad5364c9a037d2a5c58a3b91fa4eb754",
+    "packages": [
+        {
+            "name": "micro/core",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/macotsuu/micro-framework",
+                "reference": "1d5a36fdfe447dbfc7ef4e4b9f276fbeccd79437"
+            },
+            "require": {
+                "ext-memcached": "*",
+                "ext-pdo": "*"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Micro\\": "src/"
+                }
+            },
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Dominik Szamburski",
+                    "email": "macotsuu@gmail.com"
+                }
+            ],
+            "description": "Part of micro framework",
+            "time": "2021-10-25T18:55:01+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "micro/core": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
