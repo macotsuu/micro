@@ -17,7 +17,7 @@
   ],
 
   "require": {
-    "micro/core": "dev-master",
+    "micro/core": "v0.1.0",
     "ext-pdo": "*",
     "ext-memcached": "*"
   }
