@@ -1,12 +1,12 @@
 <?php
-
     use Micro\Application;
-    use Micro\Configuration;
+    use Micro\Http\Request;
 
     require __DIR__ . '/../vendor/autoload.php';
 
-    $config = Configuration::getInstance();
-    $config->load(dirname(__DIR__) . '/app/config/');
-
     $app = Application::getInstance(dirname(__DIR__));
-    $app->handle();
+
+    $request = new Request();
+    $response = $app->handle($request);
+
+    $response->send();

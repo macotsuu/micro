@@ -1,0 +1,1 @@
+<h1>Welcome in Micro Framework</h1>

@@ -12,7 +12,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/macotsuu/micro-framework",
-                "reference": "1d5a36fdfe447dbfc7ef4e4b9f276fbeccd79437"
+                "reference": "ccf5eca2e96cf5ef790d61f1435b7f8b542547de"
             },
             "require": {
                 "ext-memcached": "*",
@@ -35,7 +35,7 @@
                 }
             ],
             "description": "Part of micro framework",
-            "time": "2021-10-25T18:55:01+00:00"
+            "time": "2021-10-26T20:23:21+00:00"
         }
     ],
     "packages-dev": [],
