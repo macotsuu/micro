@@ -5,11 +5,12 @@
   "authors": [
     {
       "name": "Dominik Szamburski",
-      "email": "macotsuu@gmail.com"
+      "email": "macotsuu@gmail.com",
+      "role": "Developer"
     }
   ],
   "require": {
-    "php": ">= 7.4"
+    "php": ">=8.0"
   },
   "autoload": {
     "psr-4": {
