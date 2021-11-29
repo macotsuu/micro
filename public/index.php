@@ -1,12 +1,16 @@
 <?php
-    use Micro\Application;
-    use Micro\Http\Request;
+
+    use Micro\Micro;
+    use Micro\Router\Router;
 
     require __DIR__ . '/../vendor/autoload.php';
 
-    $app = Application::getInstance(dirname(__DIR__));
+    $router = new Router();
+    $router->get('/', function ($req, $res) {
+        print_r("<pre>");
+        print_r($req);
+        print_r("</pre>");
+    });
 
-    $request = new Request();
-    $response = $app->handle($request);
-
-    $response->send();
+    $app = new Micro();
+    $app->handle($router);

@@ -1,24 +1,19 @@
 {
-  "autoload": {
-    "files": [
-      "app/helpers/cache.php",
-      "app/helpers/config.php",
-      "app/helpers/database.php",
-      "app/helpers/logger.php",
-      "app/helpers/template.php"
-    ]
-  },
-
-  "repositories": [
+  "name": "micro/micro",
+  "license": "GPL-3.0-or-later",
+  "version": "0.1.0",
+  "authors": [
     {
-      "type": "git",
-      "url": "https://github.com/macotsuu/micro-framework"
+      "name": "Dominik Szamburski",
+      "email": "macotsuu@gmail.com"
     }
   ],
-
   "require": {
-    "micro/core": "v0.1.0",
-    "ext-pdo": "*",
-    "ext-memcached": "*"
+    "php": ">= 7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Micro\\": "src/Micro"
+    }
   }
 }

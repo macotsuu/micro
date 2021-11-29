@@ -4,39 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad57a000f75adb7294f460c19fdd7cf7",
-    "packages": [
-        {
-            "name": "micro/core",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/macotsuu/micro-framework",
-                "reference": "10e7efe79bd67727484762275dc3b1e835f18a34"
-            },
-            "require": {
-                "ext-memcached": "*",
-                "ext-pdo": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Micro\\": "src/"
-                }
-            },
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Dominik Szamburski",
-                    "email": "macotsuu@gmail.com"
-                }
-            ],
-            "description": "Part of micro framework",
-            "time": "2021-10-26T20:32:06+00:00"
-        }
-    ],
+    "content-hash": "47560043eaf91b954b32c3c4661b9403",
+    "packages": [],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
@@ -44,8 +13,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-pdo": "*",
-        "ext-memcached": "*"
+        "php": ">= 7.4"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
