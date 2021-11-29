@@ -36,16 +36,13 @@
                     preg_match('/^PHP_AUTH_/', $header) ||
                     preg_match('/^REQUEST_/', $header)
                 ) {
-                    if (str_starts_with('HTTP_', $header)) {
-                        if (str_starts_with($header, 'HTTP_')) {
-                            $this->headers[substr($header, 5)] = $value;
-                        }
-
-                        if (in_array($header, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'], true)) {
-                            $this->headers[$header] = $value;
-                        }
+                    if (str_starts_with($header, 'HTTP_')) {
+                        $this->headers[substr($header, 5)] = $value;
                     }
-                    $this->headers[$header] = $value;
+
+                    if (in_array($header, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'], true)) {
+                        $this->headers[$header] = $value;
+                    }
                 }
             }
 
