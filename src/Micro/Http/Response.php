@@ -1,7 +1,6 @@
 <?php
     namespace Micro\Http;
 
-    use Micro\Enums\Dirs;
     use Micro\Enums\HTTPStatus;
     use Micro\Template\Template;
 
@@ -11,6 +10,7 @@
 
     class Response
     {
+        public array $params = [];
         private array $headers;
         private string $body;
         private string $statusText;
