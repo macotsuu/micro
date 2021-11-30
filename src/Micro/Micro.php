@@ -1,19 +1,45 @@
 <?php
     namespace Micro;
 
-    use Micro\Router\Router;
+    use Micro\Enums\Dirs;
     use Micro\Http\Request;
-    use Micro\Http\Response;
+    use Micro\Router\Router;
+    use Micro\Router\Middleware\MiddlewareCollection;
+    use Micro\Router\Middleware\MiddlewareDispatcher;
+    use Micro\Router\Middleware\MiddlewareInterface;
+    use Micro\Template\Template;
 
     class Micro
     {
+        private string $baseDir;
+        private Template $template;
+        private MiddlewareCollection $middlewares;
+
+        public function __construct(string $baseDir)
+        {
+            $this->middlewares = new MiddlewareCollection(-1);
+            $this->baseDir = $baseDir;
+
+            $this->template = new Template($this->getPath(Dirs::VIEWS), $this->getPath(Dirs::CACHE));
+        }
+
+        public function use(MiddlewareInterface $middleware): Micro
+        {
+            $this->middlewares->push($middleware);
+
+            return $this;
+        }
+
         public function handle(Router $router)
         {
-            $req = new Request();
-            $res = new Response();
+            $request = new Request();
+            $dispatcher = new MiddlewareDispatcher($this->middlewares);
 
-            foreach ($router->getRoutes()->all($_SERVER['REQUEST_METHOD']) as $route) {
-                $path = '/' . rtrim(ltrim(trim(strtok($_SERVER["REQUEST_URI"], '?')), '/'), '/');
+            $response = $dispatcher->handle($request);
+            $response->setTemplateEngine($this->template);
+
+            foreach ($router->getRoutes()->all($request->method) as $route) {
+                $path = '/' . rtrim(ltrim(trim(strtok($request->path, '?')), '/'), '/');
 
                 if (preg_match($route->route, $path, $matches)) {
                     $values = array_filter($matches, static function ($key) {
@@ -21,21 +47,19 @@
                     }, ARRAY_FILTER_USE_KEY);
 
                     foreach ($values as $key => $value) {
-                        $req->params[$key] = $value;
+                        $request->params[$key] = $value;
                     }
 
-                    if (is_string($route->callback)) {
-                        $instance = new $route->callback();
-                        $instance->handle($req, $res);
-
-                    } else {
-                        $callback = $route->callback;
-                        $callback($req, $res);
-                    }
+                    $instance = new $route->callback;
+                    $instance->handle($request, $response);
 
                     break;
                 }
             }
         }
 
+        private function getPath(Dirs $dir): string
+        {
+            return $this->baseDir . '/' . $dir->path();
+        }
     }

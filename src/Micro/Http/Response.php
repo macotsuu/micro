@@ -14,7 +14,7 @@
         private array $headers;
         private string $body;
         private string $statusText;
-        private string $protocolVersion;
+        private string $protocolVersion = '2.0';
         private HTTPStatus $statusCode;
 
         private Template $template;
@@ -23,9 +23,6 @@
         {
             $this->withBody('');
             $this->withStatus(HTTPStatus::OK);
-            $this->withProtocolVersion('2.0');
-
-            $this->template = new Template(Dirs::VIEWS->path(), Dirs::CACHE->path());
         }
 
         public function render(string $tmpl, array $data = [])
@@ -43,22 +40,19 @@
             $this->sendHeaders()->sendBody()->end();
         }
 
-
         public function send(string $data)
         {
             $this->withBody($data)->sendHeaders()->sendBody()->end();
         }
 
+        public function setTemplateEngine(Template $template)
+        {
+            $this->template = $template;
+        }
+
         private function withBody($body): Response
         {
             $this->body = $body;
-
-            return $this;
-        }
-
-        private function withProtocolVersion($protocolVersion): Response
-        {
-            $this->protocolVersion = $protocolVersion;
 
             return $this;
         }
@@ -108,15 +102,6 @@
                 }
             }
 
-            if ('HTTP/1.0' != $_SERVER['SERVER_PROTOCOL']) {
-                $this->withProtocolVersion('2.0');
-            }
-
-            if ('1.0' == $this->protocolVersion && str_contains($this->headers['Cache-Control'], 'no-cache')) {
-                $this->headers['pragma'] ='no-cache';
-                $this->headers['expires'] = -1;
-            }
-
             foreach ($this->headers as $header => $values) {
                 $replace = 0 === strcasecmp($header, 'Content-Type');
                 header($header.': '.$values, $replace, $this->statusCode->value);
@@ -127,7 +112,7 @@
             return $this;
         }
 
-        private function sendBody()
+        private function sendBody(): Response
         {
             echo $this->body;
 
