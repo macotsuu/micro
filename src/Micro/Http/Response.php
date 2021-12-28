@@ -1,68 +1,123 @@
 <?php
+
     namespace Micro\Http;
 
     use Micro\Enums\HTTPStatus;
     use Micro\Template\Template;
-
     use function count;
     use const PHP_OUTPUT_HANDLER_FLUSHABLE;
     use const PHP_OUTPUT_HANDLER_REMOVABLE;
 
-    class Response
-    {
+    class Response {
+        
+        /** @var array $params */
         public array $params = [];
-        private array $headers;
-        private string $body;
-        private string $statusText;
+        
+        /** @var array $headers */
+        public array $headers = [];
+        
+        /** @var string $protocolVersion */
         private string $protocolVersion = '2.0';
-        private HTTPStatus $statusCode;
+        
+        /** @var string $content **/
+        private string $content;
+        
+        /** @var int $statusCode */
+        private int $statusCode;
+        
+        /** @var string $statusText */
+        private string $statusText;
 
-        private Template $template;
-
-        public function __construct()
-        {
-            $this->withBody('');
-            $this->withStatus(HTTPStatus::OK);
+        /** @var $statusTexts */
+        public array $statusTexts = [
+            100 => 'Continue',
+            101 => 'Switching Protocols',
+            200 => 'OK',
+            201 => 'Created',
+            202 => 'Accepted',
+            203 => 'Non-Authoritative Information',
+            204 => 'No Content',
+            205 => 'Reset Content',
+            206 => 'Partial Content',
+            300 => 'Multiple Choices',
+            301 => 'Moved Permanently',
+            302 => 'Found',
+            303 => 'See Other',
+            304 => 'Not Modified',
+            305 => 'Use Proxy',
+            306 => '(Unused)',
+            307 => 'Temporary Redirect',
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            402 => 'Payment Required',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            406 => 'Not Acceptable',
+            407 => 'Proxy Authentication Required',
+            408 => 'Request Timeout',
+            409 => 'Conflict',
+            410 => 'Gone',
+            411 => 'Length Required',
+            412 => 'Precondition Failed',
+            413 => 'Request Entity Too Large',
+            414 => 'Request-URI Too Long',
+            415 => 'Unsupported Media Type',
+            416 => 'Requested Range Not Satisfiable',
+            417 => 'Expectation Failed',
+            500 => 'Internal Server Error',
+            501 => 'Not Implemented',
+            502 => 'Bad Gateway',
+            503 => 'Service Unavailable',
+            504 => 'Gateway Timeout',
+            505 => 'HTTP Version Not Supported'
+        ];
+            
+        public function __construct(?string $content = '', int $status = 200) {
+            $this->withContent($content);
+            $this->withStatus($status);
         }
 
-        public function render(string $tmpl, array $data = [])
-        {
-            $template = $this->template->render($tmpl, $data);
-
-            $this->send($template);
-        }
-
-        public function redirect(string $location, $status = HTTPStatus::HTTP_MOVED_PERMANENTLY)
-        {
+        public function redirect(string $location, $status = 301) {
             $this->headers['Location'] = $location;
             $this->withStatus($status);
 
             $this->sendHeaders()->sendBody()->end();
         }
-
-        public function send(string $data)
-        {
-            $this->withBody($data)->sendHeaders()->sendBody()->end();
+        
+        public function json($data, int $status = 200) {
+            $this->headers['Content-Type'] = 'application/json; charset=utf-8';
+           
+            $this->withStatus($status);
+            $this->withContent(json_encode($data));
+                        
+            $this->send();
         }
 
-        public function setTemplateEngine(Template $template)
-        {
-            $this->template = $template;
+        public function send() {       
+            echo $this->content;
+            
+            
+            $status = ob_get_status(true);
+            $level = count($status);
+            $flags = PHP_OUTPUT_HANDLER_REMOVABLE | PHP_OUTPUT_HANDLER_FLUSHABLE;
+            
+            while ($level-- > 0 && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
+                ob_get_flush();
+            }
         }
 
-        private function withBody($body): Response
-        {
-            $this->body = $body;
+        public function withContent(string $content): Response {
+            $this->content = $content;
 
             return $this;
         }
 
-        public function withStatus(HTTPStatus $statusCode, string $text = null): Response
-        {
+        public function withStatus(int $statusCode, string $text = null): Response {
             $this->statusCode = $statusCode;
 
             if (null === $text) {
-                $this->statusText = HTTPStatus::getMessage($statusCode);
+                $this->statusText = $this->statusTexts[$statusCode] ?: 'unknown';
 
                 return $this;
             }
@@ -70,14 +125,13 @@
             return $this;
         }
 
-        private function sendHeaders(): Response
-        {
+        private function sendHeaders(): Response {
             if (headers_sent()) {
                 return $this;
             }
 
-            if ($this->statusCode->value >= 100 && $this->statusCode->value < 200 || in_array($this->statusCode->value, [204, 304])) {
-                $this->withBody(null);
+            if ($this->statusCode >= 100 && $this->statusCode < 200 || in_array($this->statusCode, [204, 304])) {
+                $this->withContent(null);
 
                 unset($this->headers['Content-Type']);
                 unset($this->headers['Content-Length']);
@@ -104,30 +158,11 @@
 
             foreach ($this->headers as $header => $values) {
                 $replace = 0 === strcasecmp($header, 'Content-Type');
-                header($header.': '.$values, $replace, $this->statusCode->value);
+                header($header . ': ' . $values, $replace, $this->statusCode);
             }
 
-            header(sprintf('HTTP/%s %s %s', $this->protocolVersion, $this->statusCode->value, $this->statusText), true, $this->statusCode->value);
+            header(sprintf('HTTP/%s %s %s', $this->protocolVersion, $this->statusCode, $this->statusText), true, $this->statusCode);
 
             return $this;
-        }
-
-        private function sendBody(): Response
-        {
-            echo $this->body;
-
-            return $this;
-        }
-
-
-        private function end()
-        {
-            $status = ob_get_status(true);
-            $level = count($status);
-            $flags = PHP_OUTPUT_HANDLER_REMOVABLE | PHP_OUTPUT_HANDLER_FLUSHABLE;
-    
-            while ($level-- > 0 && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
-                ob_get_flush();
-            }
         }
     }

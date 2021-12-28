@@ -1,26 +1,19 @@
 <?php
     namespace Micro;
 
-    use Micro\Enums\Dirs;
     use Micro\Http\Request;
     use Micro\Router\Router;
     use Micro\Router\Middleware\MiddlewareCollection;
     use Micro\Router\Middleware\MiddlewareDispatcher;
     use Micro\Router\Middleware\MiddlewareInterface;
-    use Micro\Template\Template;
 
     class Micro
     {
-        private string $baseDir;
-        private Template $template;
         private MiddlewareCollection $middlewares;
 
-        public function __construct(string $baseDir)
+        public function __construct()
         {
             $this->middlewares = new MiddlewareCollection(-1);
-            $this->baseDir = $baseDir;
-
-            $this->template = new Template($this->getPath(Dirs::VIEWS), $this->getPath(Dirs::CACHE));
         }
 
         public function use(MiddlewareInterface $middleware): Micro
@@ -36,7 +29,6 @@
             $dispatcher = new MiddlewareDispatcher($this->middlewares);
 
             $response = $dispatcher->handle($request);
-            $response->setTemplateEngine($this->template);
 
             foreach ($router->getRoutes()->all($request->method) as $route) {
                 $path = '/' . rtrim(ltrim(trim(strtok($request->path, '?')), '/'), '/');
@@ -56,10 +48,5 @@
                     break;
                 }
             }
-        }
-
-        private function getPath(Dirs $dir): string
-        {
-            return $this->baseDir . '/' . $dir->path();
         }
     }
