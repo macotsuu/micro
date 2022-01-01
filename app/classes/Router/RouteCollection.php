@@ -1,5 +1,5 @@
 <?php
-    namespace Micro\Router;
+    namespace Router;
 
     class RouteCollection
     {
@@ -19,6 +19,14 @@
 
         public function all(string $method = null): array
         {
-            return is_null($method) ? $this->routes : $this->routes[$method];
+            if (!is_null($method)) {
+                if (!empty($this->routes[$method])) {
+                    return $this->routes[$method];
+                }
+
+                return [];
+            }
+            
+            return $this->routes;
         }
     }

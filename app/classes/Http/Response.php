@@ -1,34 +1,33 @@
 <?php
 
-    namespace Micro\Http;
+    namespace Http;
 
-    use Micro\Enums\HTTPStatus;
-    use Micro\Template\Template;
     use function count;
     use const PHP_OUTPUT_HANDLER_FLUSHABLE;
     use const PHP_OUTPUT_HANDLER_REMOVABLE;
 
-    class Response {
-        
+    class Response
+    {
+
         /** @var array $params */
         public array $params = [];
-        
+
         /** @var array $headers */
         public array $headers = [];
-        
+
         /** @var string $protocolVersion */
         private string $protocolVersion = '2.0';
-        
-        /** @var string $content **/
+
+        /** @var string $content * */
         private string $content;
-        
+
         /** @var int $statusCode */
         private int $statusCode;
-        
+
         /** @var string $statusText */
         private string $statusText;
 
-        /** @var $statusTexts */
+        /** @var array $statusTexts */
         public array $statusTexts = [
             100 => 'Continue',
             101 => 'Switching Protocols',
@@ -72,48 +71,29 @@
             504 => 'Gateway Timeout',
             505 => 'HTTP Version Not Supported'
         ];
-            
-        public function __construct(?string $content = '', int $status = 200) {
+
+        public function __construct(?string $content = '', int $status = 200)
+        {
             $this->withContent($content);
             $this->withStatus($status);
         }
 
-        public function redirect(string $location, $status = 301) {
-            $this->headers['Location'] = $location;
-            $this->withStatus($status);
-
-            $this->sendHeaders()->sendBody()->end();
-        }
-        
-        public function json($data, int $status = 200) {
-            $this->headers['Content-Type'] = 'application/json; charset=utf-8';
-           
-            $this->withStatus($status);
-            $this->withContent(json_encode($data));
-                        
-            $this->send();
+        public function send(): void
+        {
+            $this->headers();
+            $this->body();
+            $this->end();
         }
 
-        public function send() {       
-            echo $this->content;
-            
-            
-            $status = ob_get_status(true);
-            $level = count($status);
-            $flags = PHP_OUTPUT_HANDLER_REMOVABLE | PHP_OUTPUT_HANDLER_FLUSHABLE;
-            
-            while ($level-- > 0 && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
-                ob_get_flush();
-            }
-        }
-
-        public function withContent(string $content): Response {
+        public function withContent(string $content): self
+        {
             $this->content = $content;
 
             return $this;
         }
 
-        public function withStatus(int $statusCode, string $text = null): Response {
+        public function withStatus(int $statusCode, string $text = null): self
+        {
             $this->statusCode = $statusCode;
 
             if (null === $text) {
@@ -125,7 +105,15 @@
             return $this;
         }
 
-        private function sendHeaders(): Response {
+        public function withHeader(string $header, string $value): self
+        {
+            $this->headers[$header] = $value;
+
+            return $this;
+        }
+
+        private function headers(): self
+        {
             if (headers_sent()) {
                 return $this;
             }
@@ -148,7 +136,7 @@
 
                 if ('HEAD' === $_SERVER['REQUEST_METHOD']) {
                     $length = $this->headers['Content-Length'];
-                    $this->body = null;
+                    $this->content = null;
 
                     if ($length) {
                         $this->headers['Content-Length'] = $length;
@@ -162,6 +150,26 @@
             }
 
             header(sprintf('HTTP/%s %s %s', $this->protocolVersion, $this->statusCode, $this->statusText), true, $this->statusCode);
+
+            return $this;
+        }
+
+        private function body(): self
+        {
+            echo $this->content;
+
+            return $this;
+        }
+
+        private function end(): self
+        {
+            $status = ob_get_status(true);
+            $level = count($status);
+            $flags = PHP_OUTPUT_HANDLER_REMOVABLE | PHP_OUTPUT_HANDLER_FLUSHABLE;
+
+            while ($level-- > 0 && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
+                ob_get_flush();
+            }
 
             return $this;
         }

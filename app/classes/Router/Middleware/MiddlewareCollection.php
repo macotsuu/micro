@@ -1,6 +1,6 @@
 <?php
 
-    namespace Micro\Router\Middleware;
+    namespace Router\Middleware;
 
     class MiddlewareCollection
     {

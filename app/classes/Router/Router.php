@@ -1,11 +1,11 @@
 <?php
-    namespace Micro\Router;
+    namespace Router;
 
-    use ArrayObject;
     use Closure;
 
     class Router
     {
+        /** @var RouteCollection $routes */
         private RouteCollection $routes;
 
         public function __construct()
@@ -13,39 +13,14 @@
             $this->routes = new RouteCollection();
         }
 
-        /**
-         * @param string $path
-         * @param string|Closure $callback
+        /** Return all routes
          *
-         * @return $this
+         * @param string $method
+         * @return array
          */
-        public function get(string $path, string|Closure $callback): Router
+        public function getRoutes(string $method = 'GET'): array
         {
-           $this->addRoute('GET', $path, $callback);
-
-           return $this;
-        }
-
-        /**
-         * @param string $path
-         * @param string|Closure $callback
-         *
-         * @return $this
-         */
-        public function post(string $path, string|Closure $callback): Router
-        {
-            $this->addRoute('POST', $path, $callback);
-
-            return $this;
-        }
-
-        /** Return Routes Collection
-         *
-         * @return RouteCollection
-         */
-        public function getRoutes(): RouteCollection
-        {
-            return $this->routes;
+            return $this->routes->all($method);
         }
 
         /**
@@ -56,7 +31,7 @@
          *
          * @retrun void
          */
-        private function addRoute(string $method, string $path, string|Closure $callback): void
+        public function addRoute(string $method, string $path, string|Closure $callback): void
         {
             $route = new Route($method, $this->pattern($path), $callback);
 

@@ -1,5 +1,5 @@
 <?php
-    namespace Micro\Router;
+    namespace Router;
 
     use Closure;
 

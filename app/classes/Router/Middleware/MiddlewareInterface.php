@@ -1,8 +1,8 @@
 <?php
-    namespace Micro\Router\Middleware;
+    namespace Router\Middleware;
 
-    use Micro\Http\Request;
-    use Micro\Http\Response;
+    use Http\Request;
+    use Http\Response;
 
     interface MiddlewareInterface
     {

@@ -1,5 +1,5 @@
 <?php
-    namespace Micro\Http;
+    namespace Http;
 
     class Request
     {
@@ -32,9 +32,9 @@
         {
             foreach ($_SERVER as $header => $value) {
                 if (
-                    preg_match('/^HTTP_/', $header) ||
-                    preg_match('/^PHP_AUTH_/', $header) ||
-                    preg_match('/^REQUEST_/', $header)
+                    str_starts_with($header, 'HTTP_') ||
+                    str_starts_with($header, 'PHP_AUTH_') ||
+                    str_starts_with($header, 'REQUEST_')
                 ) {
                     if (str_starts_with($header, 'HTTP_')) {
                         $this->headers[substr($header, 5)] = $value;
