@@ -1,5 +1,6 @@
 .idea/
 .DS_STORE
-logs/
+logs/*
+!logs/.gitkeep
 vendor/
 /nbproject
