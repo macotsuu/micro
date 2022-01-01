@@ -1,5 +1,5 @@
 # Micro Framework
-Minimal, zero dependency framework for PHP
+Minimal, zero dependency chassis framework for PHP microservices
 
 ## Installation
 Add repositories in composer.json
